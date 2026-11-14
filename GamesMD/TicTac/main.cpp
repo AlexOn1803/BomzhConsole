@@ -134,7 +134,6 @@ static void draw() {
       uint16_t col = o == 0 ? XC : OC;
       if (c == fading) col = mix565(col, CELL, 160);   // semi-transparent: disappears on this move
       if (o == 0) drawX(x + CS / 2, y + CS / 2, 20, col); else drawO(x + CS / 2, y + CS / 2, 24, col, inLine ? mix565(CELL, OC, 70) : CELL);
-      if (c == fading) text("зникне", x + CS / 2, y + CS - 6, pal::DIM, F9B, CENTER);
     }
     if (scr == S_PLAY && c == cur && !(sv.mode == 0 && pos.turn == 1)) {
       uint16_t cc = legal(pos, c) ? pal::AMBER : pal::RED;
