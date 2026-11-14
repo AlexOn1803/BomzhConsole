@@ -209,7 +209,9 @@ static void tick(float dt) {
   }
   if (!act && mode == M_PLAY) {
     // gravity: nothing under the pod → fall (unless holding ▲)
-    if (!solidAt(g.px, g.py + 1) && !(inputHeld(K_UP) && g.fuel > 0)) {
+    // on the surface the pod stays on the ground level until ▼ is pressed, even above a dug shaft
+    bool surfaceHold = g.py == SURF - 1 && !inputHeld(K_DOWN);
+    if (!surfaceHold && !solidAt(g.px, g.py + 1) && !(inputHeld(K_UP) && g.fuel > 0)) {
       if (inMap(g.px, g.py + 1)) { act = 3; adx = 0; ady = 1; actT = 0; actDur = std::max(0.07f, 0.16f - fallTiles * 0.02f); }
     } else if (fallTiles >= 4) {
       damage((fallTiles - 3) * 4.0f, "Удар при падінні");
