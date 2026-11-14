@@ -442,6 +442,108 @@ static void wifiMode() {
   esp_restart();   // the lent part of the frame buffer cannot be taken back from the heap
 }
 
+// ---------- saves menu (hold Back in the game list) ----------
+struct SaveFile { std::string id, label; uint32_t size; };
+
+static std::vector<SaveFile> listSaves() {
+  std::vector<SaveFile> v;
+  if (!st.sd) return v;
+  File d = SD.open("/saves");
+  if (d) for (File f = d.openNextFile(); f; f = d.openNextFile()) {
+    String n = f.name();
+    int sl = n.lastIndexOf('/');
+    if (sl >= 0) n = n.substring(sl + 1);
+    if (f.isDirectory() || !n.endsWith(".sav")) continue;
+    SaveFile s;
+    s.id = n.substring(0, n.length() - 4).c_str();
+    s.label = s.id;
+    for (auto& g : st.games) if (g.file.substr(0, g.file.find('.')) == s.id) s.label = g.title;   // show the game's title
+    s.size = f.size();
+    v.push_back(s);
+  }
+  if (d) d.close();
+  return v;
+}
+
+static void eraseSave(const std::string& id) {
+  SD.remove((std::string("/saves/") + id + ".sav").c_str());
+  SD.remove((std::string("/saves/") + id + ".tmp").c_str());
+  Preferences p;                       // the backup copy in internal flash
+  if (p.begin("bzsave", false)) { p.remove(id.c_str()); p.end(); }
+}
+
+static bool askYesNo(const std::string& title, const std::string& body) {
+  std::string o[2] = {"Так", "Ні"};
+  int sel = 1;
+  inputClear();
+  for (;;) {
+    drawMenu(st);
+    uiDialog(title, body, o, 2, sel);
+    present();
+    int k;
+    while ((k = (consolePoll(), inputGet())) < 0) delay(10);
+    if (k == K_LEFT || k == K_RIGHT || k == K_UP || k == K_DOWN) sel ^= 1;
+    if (k == K_BACK || k == K_BACK_LONG) return false;
+    if (k == K_OK) return sel == 0;
+  }
+}
+
+static void savesMenu() {
+  using namespace gfx;
+  int sel = 0, top = 0;
+  inputClear();
+  for (;;) {
+    std::vector<SaveFile> sv = listSaves();
+    int n = (int)sv.size() + 2;          // saves + "all" + "close"
+    if (sel >= n) sel = n - 1;
+    drawMenu(st);
+    blendRect(0, 0, W, H, pal::SHADE, 180);
+    fill(10, 30, W - 20, 262, pal::PANEL);
+    strokeRect(10, 30, W - 20, 262, pal::AMBER);
+    text("ЗБЕРЕЖЕННЯ", W / 2, 48, pal::AMBER, F12B, CENTER);
+    text(sv.empty() ? "Збережень немає" : "OK — видалити вибране", W / 2, 64, pal::SUB, F11, CENTER);
+    const int VIS = 10;
+    if (sel < top) top = sel;
+    if (sel >= top + VIS) top = sel - VIS + 1;
+    for (int i = top; i < n && i < top + VIS; i++) {
+      int y = 86 + (i - top) * 20;
+      bool s = i == sel;
+      if (s) fill(16, y - 13, W - 32, 18, i == (int)sv.size() ? pal::RED : pal::AMBER);
+      if (i < (int)sv.size()) {
+        text(fit(sv[i].label, W - 90, F11B), 22, y, s ? pal::SELTXT : pal::TXT, F11B);
+        char b[16];
+        snprintf(b, sizeof b, "%u Б", (unsigned)sv[i].size);
+        text(b, W - 22, y, s ? pal::SELTXT : pal::DIM, F10B, RIGHT);
+      } else if (i == (int)sv.size()) text("Видалити ВСІ збереження", 22, y, s ? rgb(0xffffff) : pal::RED, F11B);
+      else text("Закрити", 22, y, s ? pal::SELTXT : pal::TXT, F11B);
+    }
+    uiHint("▲▼ — вибір · OK — видалити · Назад — закрити");
+    present();
+    int k;
+    while ((k = (consolePoll(), inputGet())) < 0) delay(10);
+    if (k == K_UP) sel = (sel + n - 1) % n;
+    if (k == K_DOWN) sel = (sel + 1) % n;
+    if (k == K_BACK || k == K_BACK_LONG) break;
+    if (k == K_OK) {
+      if (sel == n - 1) break;
+      if (sel == (int)sv.size()) {
+        if (sv.empty()) continue;
+        if (askYesNo("ВИДАЛИТИ ВСЕ?", "Усі збереження всіх ігор зникнуть назавжди.")) {
+          for (auto& f : sv) eraseSave(f.id);
+          Preferences p;
+          if (p.begin("bzsave", false)) { p.clear(); p.end(); }
+          st.msg = "Усі збереження видалено";
+          break;
+        }
+      } else if (askYesNo("ВИДАЛИТИ?", "Збереження гри «" + sv[sel].label + "» зникне назавжди. Гра почнеться спочатку.")) {
+        eraseSave(sv[sel].id);
+        st.msg = "Видалено: " + sv[sel].label;
+      }
+    }
+  }
+  inputClear();
+}
+
 // ---------- menu ----------
 void setup() {
   consoleBegin("launcher");
@@ -488,5 +590,6 @@ void loop() {
     }
   }
   if (k == K_BACK) { scanGames(); st.msg = "Список оновлено"; }
+  if (k == K_BACK_LONG) savesMenu();   // hold Back: manage saves
   redraw();
 }

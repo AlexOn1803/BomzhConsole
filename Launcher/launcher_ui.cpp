@@ -157,7 +157,7 @@ void drawMenu(LauncherState& st) {
   // scroll marks
   if (st.top > 0) tri(W / 2 - 5, 44, W / 2 + 5, 44, W / 2, 40, pal::SUB);
   if (y > YMAX - 10 && st.items.size() > 0 && st.sel < (int)st.items.size() - 1) tri(W / 2 - 5, YMAX - 4, W / 2 + 5, YMAX - 4, W / 2, YMAX, pal::SUB);
-  uiHint(st.msg.empty() ? "▲▼ — вибір · OK — запустити" : st.msg);
+  uiHint(st.msg.empty() ? "OK — грати · утримай Назад — збереження" : st.msg);
 }
 
 void drawInstall(const std::string& title, uint32_t done, uint32_t total, const char* head) {
