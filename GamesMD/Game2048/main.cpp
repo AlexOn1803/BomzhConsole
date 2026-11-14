@@ -59,6 +59,7 @@ static void newGame() {
 }
 
 // slide one line toward index 0; returns true if anything moved
+static bool mergedAny;
 static bool slide(uint8_t* v[N], uint32_t& gained, bool& made2048) {
   uint8_t out[N] = {0};
   int w = 0;
@@ -69,6 +70,7 @@ static bool slide(uint8_t* v[N], uint32_t& gained, bool& made2048) {
       out[w - 1]++;
       gained += 1u << out[w - 1];
       if (out[w - 1] == 11) made2048 = true;
+      mergedAny = true;
       merged = true;
     } else {
       out[w++] = *v[i];
@@ -95,14 +97,16 @@ static void move(int k) {
     moved |= slide(v, gained, made);
   }
   if (!moved) return;
+  if (mergedAny) sfxCoin(); else sfxClick();
+  mergedAny = false;
   memcpy(s.ub, before.b, sizeof s.ub);
   s.uscore = before.score;
   s.canUndo = 1;
   s.score += gained;
   if (s.score > s.best) s.best = s.score;
   spawn();
-  if (made && !s.won) { s.won = 1; dlg = D_WON; dlgSel = 0; }
-  if (!canMove()) { s.over = 1; dlg = D_OVER; dlgSel = 0; }
+  if (made && !s.won) { s.won = 1; dlg = D_WON; dlgSel = 0; sfxWin(); }
+  if (!canMove()) { s.over = 1; dlg = D_OVER; dlgSel = 0; sfxLose(); }
   dirty = true;
 }
 

@@ -267,10 +267,13 @@ void loop() {
     else if (inputHeld(K_UP)) dir = 0; else if (inputHeld(K_DOWN)) dir = 1; else if (inputHeld(K_LEFT)) dir = 2; else if (inputHeld(K_RIGHT)) dir = 3;
     if (dir < 4) face = dir == 0 ? 0 : dir == 1 ? 1 : dir == 2 ? 2 : 3;
     bool cp = false;
+    uint8_t g0 = st.gems, r0 = st.red, k0 = st.keys;
     if (step(st, dir, &cp)) moves++;
+    if (st.gems > g0 || st.red > r0 || st.keys > k0) sfxCoin();
+    if (cp) sfxSelect();
     if (cp) { checkpoint = st; hasCheckpoint = true; }
-    if (st.won) finishLevel();
-    else if (st.dead) { mode = M_DEAD; deadAt = now; }
+    if (st.won) { finishLevel(); sfxWin(); }
+    else if (st.dead) { mode = M_DEAD; deadAt = now; sfxLose(); }
   }
   draw();
   present();

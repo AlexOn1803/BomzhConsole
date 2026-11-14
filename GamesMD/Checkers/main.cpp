@@ -192,8 +192,8 @@ static void refreshLegal() { nLegal = genMoves(sv.b, sv.turn > 0 ? 1 : -1, legal
 
 static void finish(int result) {   // 1 player won, -1 computer won, 0 draw
   sv.over = 1; mode = M_OVER;
-  if (result > 0) { sv.wins++; overText = "Ти переміг!"; }
-  else if (result < 0) { sv.losses++; overText = "Переміг комп'ютер."; }
+  if (result > 0) { sv.wins++; overText = "Ти переміг!"; sfxWin(); }
+  else if (result < 0) { sv.losses++; overText = "Переміг комп'ютер."; sfxLose(); }
   else { sv.draws++; overText = "Нічия."; }
   saveData(&sv, sizeof sv);
 }
@@ -211,6 +211,7 @@ static void playerMove(const Move& m) {
   if (sv.nh == 24) { memmove(sv.hist, sv.hist + 1, sizeof(Board) * 23); sv.nh--; }
   sv.hist[sv.nh++] = sv.b;
   apply(sv.b, m);
+  if (m.nc) sfxHit(); else sfxClick();
   sel = -1;
   afterMove(m);
   if (!sv.over) mode = M_THINK;
@@ -369,7 +370,7 @@ void loop() {
   if (mode == M_THINK) {
     draw(); present();
     Move m;
-    if (aiMove(m)) { apply(sv.b, m); lastAi = m; hasLastAi = true; afterMove(m); }
+    if (aiMove(m)) { apply(sv.b, m); if (m.nc) sfxHit(); else tone2(700, 40); lastAi = m; hasLastAi = true; afterMove(m); }
     if (!sv.over) { mode = M_PLAY; sv.turn = 1; refreshLegal(); }
     saveData(&sv, sizeof sv);
     changed = true;

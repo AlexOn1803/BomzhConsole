@@ -24,14 +24,14 @@ struct GameEntry {
 // or the same rows one per line without quotes.
 void parseGameTxt(const std::string& txt, GameEntry& g);
 
-enum ItemKind { IT_GAME, IT_WIFI, IT_AUTORUN, IT_UPDATE };
+enum ItemKind { IT_GAME, IT_WIFI, IT_AUTORUN, IT_UPDATE, IT_SOUND };
 struct MenuItem { ItemKind kind; int game; };
 
 struct LauncherState {
   std::vector<GameEntry> games;
   std::vector<MenuItem> items;
   int sel = 0, top = 0;
-  bool sd = false, autorun = false, fwPending = false;   // fwPending: /firmware/launcher.bin is waiting
+  bool sd = false, autorun = false, fwPending = false, sound = true;   // fwPending: /firmware/launcher.bin is waiting
   uint64_t sdTotal = 0, sdUsed = 0;
   std::string msg;
 };

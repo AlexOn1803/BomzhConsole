@@ -59,7 +59,7 @@ static void reset() {
 
 static void over() {
   if (mode == OVER) return;
-  mode = OVER; overAt = nowMs(); sv.games++;
+  mode = OVER; overAt = nowMs(); sv.games++; sfxLose();
   if ((uint32_t)score > sv.best) { sv.best = score; newBest = true; }
   saveData(&sv, sizeof sv);
 }
@@ -86,6 +86,7 @@ static void physics(float dt) {
         y = p.y;
         bool spr = p.spring && fabsf(x - (p.x + PLW / 2)) < 12;
         vy = spr ? SPRING : JUMP;
+        if (spr) sfxWin(); else sfxJump();
         if (spr) p.used = true;
         break;
       }
@@ -100,7 +101,7 @@ static void physics(float dt) {
     mon.ph += dt * 3;
     float mx = mon.x + sinf(mon.ph) * 14, my = mon.y;
     if (fabsf(x - mx) < 18 && y > my - 16 && y - 22 < my + 10) {
-      if (vy > 0 && oy <= my - 8) { mon.on = false; vy = JUMP; score += 50; }
+      if (vy > 0 && oy <= my - 8) { mon.on = false; vy = JUMP; score += 50; sfxHit(); }
       else { mode = PLAY; vy = 200; over(); }
     }
     for (auto& s : sh) if (s.on && fabsf(s.x - mx) < 16 && fabsf(s.y - my) < 14) { s.on = false; mon.on = false; score += 50; }

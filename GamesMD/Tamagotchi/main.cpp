@@ -75,7 +75,7 @@ static void save() { saveData(&pet, sizeof pet); lastSave = nowMs(); }
 static void tick() {
   if (pet.stage == S_GONE) return;
   pet.ageSec++;
-  if (pet.stage == S_EGG) { if (pet.ageSec >= 40) { pet.stage = S_BABY; say("Вилупився! Привіт!"); } return; }
+  if (pet.stage == S_EGG) { if (pet.ageSec >= 40) { pet.stage = S_BABY; say("Вилупився! Привіт!"); sfxWin(); } return; }
   float m = 1.0f / 60;   // per-second share of the per-minute rates below
   bool sleep = pet.asleep;
   pet.hunger = clamp(pet.hunger - (sleep ? 2.5f : 6) * m);
@@ -89,7 +89,7 @@ static void tick() {
   if (sleep && pet.energy >= 99) { pet.asleep = 0; say("Виспався!"); }
   // illness
   if (!pet.sick && ((pet.clean < 25 && rnd(240) == 0) || (pet.hunger < 5 && rnd(300) == 0) || (pet.candies > 4 && rnd(120) == 0))) {
-    pet.sick = 1; say("Захворів! Дай ліки.");
+    pet.sick = 1; say("Захворів! Дай ліки."); sfxHit();
   }
   float dmg = 0;
   if (pet.sick) dmg += 2.5f;
@@ -110,7 +110,7 @@ static void tick() {
     snprintf(b, sizeof b, "Виріс! Тепер це %s.", FORMS[pet.form]);
     say(b);
   }
-  if (pet.health <= 0) { pet.stage = S_GONE; mode = M_GONE; save(); }
+  if (pet.health <= 0) { pet.stage = S_GONE; mode = M_GONE; save(); sfxLose(); }
 }
 
 // ---------- drawing ----------
@@ -309,6 +309,7 @@ static void draw() {
 
 // ---------- actions ----------
 static void doAction() {
+  sfxSelect();
   if (pet.stage == S_EGG && act != A_INFO) { say("Це ще яйце. Почекай, поки вилупиться."); return; }
   if (pet.asleep && act != A_LIGHT && act != A_INFO) { say("Ш-ш-ш, він спить. Спершу ввімкни світло."); return; }
   switch (act) {
@@ -366,8 +367,8 @@ void loop() {
       continue;
     }
     if (mode == M_MAIN) {
-      if (k == K_LEFT) act = (act + NACT - 1) % NACT;
-      if (k == K_RIGHT) act = (act + 1) % NACT;
+      if (k == K_LEFT) { act = (act + NACT - 1) % NACT; sfxClick(); }
+      if (k == K_RIGHT) { act = (act + 1) % NACT; sfxClick(); }
       if (k == K_OK) doAction();
     } else if (mode == M_FOOD) {
       if (k == K_LEFT || k == K_RIGHT || k == K_UP || k == K_DOWN) foodSel ^= 1;
@@ -379,7 +380,7 @@ void loop() {
       if (k == K_BACK) { mode = M_MAIN; continue; }
       if (gPhase == 0 && (k == K_LEFT || k == K_RIGHT)) {
         gGuess = k == K_LEFT ? -1 : 1; gDir = rnd(2) ? 1 : -1;
-        if (gGuess == gDir) gWins++;
+        if (gGuess == gDir) { gWins++; sfxCoin(); } else sfxClick();
         gPhase = 1; gAt = now;
       }
     } else if (mode == M_GONE) {

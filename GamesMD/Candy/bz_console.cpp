@@ -12,6 +12,7 @@
 #include "bz_config.h"
 #include "bz_display.h"
 #include "bz_gfx.h"
+#include "bz_sound.h"
 
 LGFX tft;                       // shared with the launcher (QR code)
 static bool sdOk = false;
@@ -67,6 +68,7 @@ void consoleBegin(const char* gameId) {
   for (int i = 0; i < NBTN; i++) pinMode(PINS[i], INPUT_PULLUP);
   delay(30);
   startButtonTimer();
+  soundInit();
   const esp_partition_t* run = esp_ota_get_running_partition();
   if (digitalRead(PIN_BTN_BACK) == LOW && hasLauncher() && run && run->subtype != ESP_PARTITION_SUBTYPE_APP_FACTORY)
     returnToLauncher();                       // safety exit: hold BACK while switching on

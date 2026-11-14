@@ -80,7 +80,7 @@ static void spawn() {
 }
 
 static void die() {
-  mode = DEAD; deadAt = nowMs(); sv.games++;
+  mode = DEAD; deadAt = nowMs(); sv.games++; sfxLose();
   if ((uint32_t)score > sv.best) { sv.best = score; newBest = true; }
   saveData(&sv, sizeof sv);
 }
@@ -93,7 +93,7 @@ static void physics(float dt) {
   bool jumpHeld = inputHeld(K_OK) || inputHeld(K_UP), down = inputHeld(K_DOWN);
   if (onGround) {
     ducking = down;
-    if (jumpHeld && !down) { vy = JUMP; onGround = false; ducking = false; }
+    if (jumpHeld && !down) { vy = JUMP; onGround = false; ducking = false; sfxJump(); }
   } else {
     float g = down ? FASTFALL : (vy < 0 && jumpHeld ? G_UP : G_DOWN);
     vy += g * dt;
@@ -105,7 +105,7 @@ static void physics(float dt) {
   groundOff += dx;
   speed = fminf(420, 190 + score * 0.25f);
   score = (int)(dist / 12);
-  if (score / 100 > lastMilestone) { lastMilestone = score / 100; flashUntil = nowMs() + 700; }
+  if (score / 100 > lastMilestone) { lastMilestone = score / 100; flashUntil = nowMs() + 700; sfxCoin(); }
   if (score >= 700 && (score / 700) % 2 == 1) nightTarget = 1; else nightTarget = 0;
   nextGap -= dx;
   if (nextGap <= 0) spawn();

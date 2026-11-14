@@ -145,7 +145,7 @@ static void nextDay() {
   snprintf(nightText, sizeof nightText, "День %u · %s · рік %u\n%s%s%s", g.day, SEASON[g.season], g.year,
            g.rain ? "Сьогодні дощ — поле поливати не треба." : g.season == WINTER ? "Зима: нічого не росте, але тварини дають продукти." : "Сонячно.",
            fainted ? "\nТи заснув від утоми: лише половина сил." : "", extra);
-  mode = M_NIGHT;
+  mode = M_NIGHT; sfxSelect();
   saveData(&g, sizeof g);
   dirty = false;
 }
@@ -176,7 +176,7 @@ static void action() {
       say(b);
       break;
     }
-    case T_ROCK: if (useEnergy(4)) { c.t = T_GRASS; g.stone++; say("Камінь розбито (+1 камінь)."); } break;
+    case T_ROCK: if (useEnergy(4)) { c.t = T_GRASS; g.stone++; say("Камінь розбито (+1 камінь)."); sfxHit(); } break;
     case T_WEED: if (useEnergy(1)) { c.t = T_GRASS; if (g.hay < 999) g.hay++; say("Бур'ян скошено (+1 сіно)."); } break;
     case T_GRASS:
       if (!inField(x, y)) { say("Тут орати не можна — поле за парканом."); break; }
@@ -186,7 +186,7 @@ static void action() {
       if (ready(c)) { if (useEnergy(1)) {
         int ci = c.crop - 1;
         if (g.crops[ci] < 250) g.crops[ci]++;
-        snprintf(b, sizeof b, "Зібрано: %s", CROPS[ci].name); say(b);
+        snprintf(b, sizeof b, "Зібрано: %s", CROPS[ci].name); say(b); sfxCoin();
         if (CROPS[ci].regrow) c.age = CROPS[ci].days - CROPS[ci].regrow; else { c.crop = 0; c.age = 0; }
       } }
       else if (!c.crop) {
@@ -266,7 +266,7 @@ static void buy(const ShopItem& it) {
     if (!v) { say("Нічого продавати. Збери урожай, яйця або молоко."); return; }
     g.money += v; g.earned += v;
     memset(g.crops, 0, sizeof g.crops); g.eggs = g.milk = g.stone = 0;
-    snprintf(b, sizeof b, "Продано на %ld грн!", (long)v); say(b);
+    snprintf(b, sizeof b, "Продано на %ld грн!", (long)v); say(b); sfxWin();
     if (!g.goalDone && g.earned >= GOAL) { g.goalDone = 1; say("Мету досягнуто: зароблено 100 000 грн! Ти справжній фермер."); }
     return;
   }

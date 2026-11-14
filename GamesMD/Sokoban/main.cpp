@@ -75,12 +75,13 @@ static void step(int d) {
     int bx = nx + DX[d], by = ny + DY[d];
     if (g[by][bx] != ' ' || box[by][bx]) return;
     box[ny][nx] = false; box[by][bx] = true; push = true; pushes++;
+    if (goal[by][bx]) sfxCoin(); else sfxClick();
   }
   px = nx; py = ny; moves++;
   if (nh == HIST) { memmove(hist, hist + 1, HIST - 1); nh--; }
   hist[nh++] = d | (push ? 4 : 0);
   if (won()) {
-    mode = DONE;
+    mode = DONE; sfxWin();
     int i = sv.cur;
     newBest = !sv.bestMoves[i] || moves < sv.bestMoves[i];
     if (newBest) sv.bestMoves[i] = moves;

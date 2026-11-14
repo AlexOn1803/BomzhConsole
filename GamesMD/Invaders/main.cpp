@@ -77,7 +77,7 @@ static float ax(int c) { return GX + fx + c * (AW + 6); }
 static float ay(int r) { return 54 + fy + r * (AH + 8); }
 
 static void gameOver() {
-  mode = OVER; modeAt = nowMs(); sv.games++;
+  mode = OVER; modeAt = nowMs(); sv.games++; sfxLose();
   if ((uint32_t)score > sv.best) { sv.best = score; newBest = true; }
   if ((uint32_t)wave > sv.bestWave) sv.bestWave = wave;
   saveData(&sv, sizeof sv);
@@ -85,6 +85,7 @@ static void gameOver() {
 
 static void hitPlayer() {
   boom(px, PY, SHIP, 24);
+  sfxHit();
   boom(px, PY, FLAME, 12);
   lives--;
   mode = DYING; modeAt = nowMs();
@@ -97,7 +98,8 @@ static void killAlien(int r, int c, float x, float y, bool diving) {
   left--;
   score += pointsOf(r) * (diving ? 2 : 1);
   boom(x + AW / 2, y + AH / 2, ROWC[r]);
-  if (left == 0) { mode = WAVE; modeAt = nowMs(); }
+  tone2(180, 40);
+  if (left == 0) { mode = WAVE; modeAt = nowMs(); sfxWin(); }
 }
 
 static bool isDiving(int r, int c) { for (auto& d : dv) if (d.on && d.r == r && d.c == c) return true; return false; }
@@ -131,7 +133,7 @@ static void update(float dt) {
       s.on = false; d.on = false; killAlien(d.r, d.c, d.x, d.y, true);
     }
     if (s.on && ufo.on && fabsf(s.x - ufo.x) < 14 && s.y < 46 && s.y > 30) {
-      s.on = false; ufo.on = false; int b = (1 + randomU32() % 3) * 50; score += b; boom(ufo.x, 38, UFO, 18);
+      s.on = false; ufo.on = false; int b = (1 + randomU32() % 3) * 50; score += b; sfxCoin(); boom(ufo.x, 38, UFO, 18);
     }
   }
   for (auto& s : eb) if (s.on) {

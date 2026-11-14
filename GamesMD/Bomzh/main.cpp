@@ -43,6 +43,7 @@ void loop() {
     draw();
     present();
   } else if (k >= 0) {
+    if (k == K_OK) sfxSelect(); else sfxClick();
     key(k);
     draw();
     present();

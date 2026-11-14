@@ -65,6 +65,7 @@ static bool removeLines() {
   int n = findLines(clearMask);
   if (!n) return false;
   s.score += points(n);
+  sfxCoin();
   if (s.score > s.best) s.best = s.score;
   clearAt = nowMs();
   return true;
@@ -76,7 +77,7 @@ static void applyClear() {
 }
 
 static void endGame() {
-  s.over = 1; dlg = D_OVER; dlgSel = 0; s.games++;
+  s.over = 1; dlg = D_OVER; dlgSel = 0; s.games++; sfxLose();
   newBest = s.score >= s.best && s.score > 0;
   saveData(&s, sizeof s); dirty = false;
 }
@@ -253,7 +254,7 @@ void loop() {
           s.b[cy][cx] = moving; s.b[selY][selX] = 0;
           pathPos = 0; animAt = now;
           selX = selY = -1;
-        } else { noPath = true; noPathAt = now; }
+        } else { noPath = true; noPathAt = now; sfxHit(); }
       }
     }
     dirty = true;

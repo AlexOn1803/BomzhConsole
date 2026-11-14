@@ -147,6 +147,7 @@ static bool resolve(int px, int py) {   // (px,py): preferred spot for a new spe
     b[m.y][m.x].t = m.t; b[m.y][m.x].sp = m.sp;
   }
   combo++;
+  tone2(900 + combo * 200, 70);
   int gained = n * 20 * combo + nm * 60;
   score += gained;
   if (combo >= 3) say(combo >= 5 ? "Неймовірно!" : combo == 4 ? "Чудово!" : "Смачно!");
@@ -178,7 +179,7 @@ static void bombSwap(int bx, int by, int ox, int oy) {   // colour bomb swapped 
   for (auto& r : clr) for (bool v : r) n += v;
   combo = 1;
   score += n * 40;
-  say(both ? "Подвійна бомба!" : "Шоколадна бомба!");
+  say(both ? "Подвійна бомба!" : "Шоколадна бомба!"); sfxHit();
   st = CLEAR; anim = 0;
 }
 
@@ -216,13 +217,13 @@ static void persist() {
 static void settle() {   // board is still: check for the end of level or a dead board
   combo = 0;
   if (score >= target) {
-    st = WIN;
+    st = WIN; sfxWin();
     if ((uint32_t)score > sv.best) sv.best = score;
     sv.level = level + 1; sv.inLevel = 0;
     saveData(&sv, sizeof sv);
     return;
   }
-  if (movesLeft <= 0) { st = LOSE; sv.inLevel = 0; sv.level = level; saveData(&sv, sizeof sv); return; }
+  if (movesLeft <= 0) { st = LOSE; sfxLose(); sv.inLevel = 0; sv.level = level; saveData(&sv, sizeof sv); return; }
   if (!hasMove()) { shuffle(); say("Немає ходів — перемішую"); }
   st = IDLE; idleSince = nowMs(); hintX = -1;
   dirty = true;
@@ -248,6 +249,7 @@ static void afterSwap() {
     resolve(px, py);
   } else {
     swapCells(ax, ay, bx2, by2);   // illegal: swap back
+    sfxClick();
     st = SWAPBACK; anim = 0;
   }
 }

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "bz_console.h"
 #include "bz_fonts.h"
+#include "bz_sound.h"
 
 using namespace gfx;
 
@@ -41,8 +42,8 @@ bool confirmExit() {
     present();
     int k;
     while ((k = (consolePoll(), inputGet())) < 0) sleepMs(10);
-    if (k == K_LEFT || k == K_RIGHT || k == K_UP || k == K_DOWN) sel ^= 1;
-    if (k == K_OK) { inputClear(); return sel == 0; }
+    if (k == K_LEFT || k == K_RIGHT || k == K_UP || k == K_DOWN) { sel ^= 1; sfxClick(); }
+    if (k == K_OK) { inputClear(); sfxSelect(); return sel == 0; }
     if (k == K_BACK) { inputClear(); return false; }
   }
 }

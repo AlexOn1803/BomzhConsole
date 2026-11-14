@@ -5,15 +5,15 @@
 /* Layout: one column; a board map with every pin annotated, then each module as a card with pin → pin rows */
 :root{
   --bg:#f4f6f3; --panel:#ffffff; --fg:#17201b; --sub:#5b6a61; --line:#d5ddd6; --pcb:#1d4a33; --pcbline:#2f6b4c; --pad:#d9b45a;
-  --w-3v3:#d7262e; --w-gnd:#3a3f3c; --w-5v:#e0761b; --w-sck:#c9a400; --w-mosi:#2463d1; --w-miso:#1e9a4a; --w-tcs:#8a3fd1; --w-dc:#e05a8a; --w-sdcs:#0f9aa6; --w-btn:#6d5a3a;
+  --w-3v3:#d7262e; --w-gnd:#3a3f3c; --w-5v:#e0761b; --w-sck:#c9a400; --w-mosi:#2463d1; --w-miso:#1e9a4a; --w-tcs:#8a3fd1; --w-dc:#e05a8a; --w-sdcs:#0f9aa6; --w-btn:#6d5a3a; --w-snd:#d0409a;
   --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#101512; --panel:#18201b; --fg:#e6ece7; --sub:#97a69c; --line:#2b362f; --pcb:#163a28; --pcbline:#2f6b4c; --pad:#d9b45a;
-  --w-3v3:#ff5a5f; --w-gnd:#aab3ad; --w-5v:#ff9a45; --w-sck:#f0c93a; --w-mosi:#5b93ff; --w-miso:#3fcf72; --w-tcs:#b47bff; --w-dc:#ff7fae; --w-sdcs:#3cc8d4; --w-btn:#c9a878; color-scheme:dark}}
+  --w-3v3:#ff5a5f; --w-gnd:#aab3ad; --w-5v:#ff9a45; --w-sck:#f0c93a; --w-mosi:#5b93ff; --w-miso:#3fcf72; --w-tcs:#b47bff; --w-dc:#ff7fae; --w-sdcs:#3cc8d4; --w-btn:#c9a878; --w-snd:#ff6ac0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101512; --panel:#18201b; --fg:#e6ece7; --sub:#97a69c; --line:#2b362f; --pcb:#163a28; --pcbline:#2f6b4c; --pad:#d9b45a;
-  --w-3v3:#ff5a5f; --w-gnd:#aab3ad; --w-5v:#ff9a45; --w-sck:#f0c93a; --w-mosi:#5b93ff; --w-miso:#3fcf72; --w-tcs:#b47bff; --w-dc:#ff7fae; --w-sdcs:#3cc8d4; --w-btn:#c9a878; color-scheme:dark}
+  --w-3v3:#ff5a5f; --w-gnd:#aab3ad; --w-5v:#ff9a45; --w-sck:#f0c93a; --w-mosi:#5b93ff; --w-miso:#3fcf72; --w-tcs:#b47bff; --w-dc:#ff7fae; --w-sdcs:#3cc8d4; --w-btn:#c9a878; --w-snd:#ff6ac0; color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans)}
 .wrap{max-width:980px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
 h1{font-size:28px;line-height:1.15;margin:0;text-wrap:balance}
@@ -46,7 +46,7 @@ ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 
   <section>
     <h2>Плата: що на кожен пін</h2>
-    <p class="note" style="margin:0 0 10px">Вигляд зверху, USB-роз'єм угорі. Пін 2 вільний.</p>
+    <p class="note" style="margin:0 0 10px">Вигляд зверху, USB-роз'єм угорі.</p>
     <div class="scroll">
       <svg viewBox="0 0 960 470" role="img" aria-label="Розпіновка ESP32-C3 SuperMini з підписами з'єднань">
         <!-- board -->
@@ -143,6 +143,22 @@ ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
       </table>
       <p>Якщо на зарядці лише B+ і B−, без OUT, бери живлення з B+ і B− (через вимикач).</p>
     </div>
+    <div class="card">
+      <h2>Звук (за бажанням)</h2>
+      <p><b>Варіант 1 — п'єзо (пасивний п'єзовипромінювач):</b></p>
+      <table>
+        <tr><td class="from">п'єзо, нога 1</td><td class="arrow">→</td><td>резистор 100 Ом → <span class="wire" style="--c:var(--w-snd)"><i></i>GPIO 2</span></td></tr>
+        <tr><td class="from">п'єзо, нога 2</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-gnd)"><i></i>GND</span></td></tr>
+      </table>
+      <p><b>Варіант 2 — динамік від телефона</b> (голосніше), через MOSFET AO3400:</p>
+      <table>
+        <tr><td class="from">3V3</td><td class="arrow">→</td><td>резистор 22–33 Ом → динамік (+)</td></tr>
+        <tr><td class="from">динамік (−)</td><td class="arrow">→</td><td>Сток (D) AO3400</td></tr>
+        <tr><td class="from">Затвор (G)</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-snd)"><i></i>GPIO 2</span></td></tr>
+        <tr><td class="from">Витік (S)</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-gnd)"><i></i>GND</span></td></tr>
+      </table>
+      <p>Динамік напряму на пін не став — спалиш пін. Біполярний транзистор (S8050, BC547) теж не підходить: GPIO 2 впливає на старт плати. Звук вмикається й вимикається в меню лаунчера.</p>
+    </div>
   </section>
 
   <section class="warn">
@@ -157,7 +173,7 @@ ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
 </div>
 
 <script>
-const L=[["5V","--w-5v","від вимикача (батарея)"],["GND","--w-gnd","дисплей, SD, кнопки, зарядка"],["3V3","--w-3v3","дисплей VCC · RES · BLK, SD VDD"],["4","--w-sck","дисплей SCL + SD CLK"],["3","--w-sdcs","SD CS"],["2",null,"вільний"],["1","--w-btn","кнопка ▲"],["0","--w-btn","кнопка ▼"]];
+const L=[["5V","--w-5v","від вимикача (батарея)"],["GND","--w-gnd","дисплей, SD, кнопки, зарядка"],["3V3","--w-3v3","дисплей VCC · RES · BLK, SD VDD"],["4","--w-sck","дисплей SCL + SD CLK"],["3","--w-sdcs","SD CS"],["2","--w-snd","звук: п'єзо або динамік"],["1","--w-btn","кнопка ▲"],["0","--w-btn","кнопка ▼"]];
 const R=[["5","--w-btn","кнопка ▶"],["6","--w-mosi","дисплей SDA + SD MOSI"],["7","--w-tcs","дисплей CS"],["8","--w-btn","кнопка Назад"],["9","--w-btn","кнопка OK"],["10","--w-dc","дисплей DC"],["20","--w-btn","кнопка ◀"],["21","--w-miso","SD MISO"]];
 const NS="http://www.w3.org/2000/svg",g=document.getElementById("pins");
 function el(t,a,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;g.appendChild(e);return e}

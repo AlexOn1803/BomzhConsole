@@ -5,4 +5,5 @@
 #include "bz_fonts.h"
 #include "bz_gfx.h"
 #include "bz_input.h"
+#include "bz_sound.h"
 #include "bz_ui.h"

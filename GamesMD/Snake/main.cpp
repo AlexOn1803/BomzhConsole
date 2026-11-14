@@ -44,7 +44,7 @@ static void reset() {
 }
 
 static void gameOver() {
-  mode = OVER;
+  mode = OVER; sfxLose();
   sv.games++;
   if ((uint32_t)score > sv.best) { sv.best = score; newBest = true; }
   saveData(&sv, sizeof sv);
@@ -63,12 +63,12 @@ static void step() {
   head = (head + 1) % (COLS * ROWS);
   sx[head] = hx; sy[head] = hy;
   if (hx == ax && hy == ay) {
-    len++; score += 1; eaten++;
+    len++; score += 1; eaten++; sfxCoin();
     place(ax, ay, gx, gy);
     if (stepMs > 70) stepMs -= 3;
     if (eaten % 5 == 0 && gx < 0) { place(gx, gy, ax, ay); goldUntil = nowMs() + 6000; }
   } else if (hx == gx && hy == gy) {
-    len++; score += 5;
+    len++; score += 5; sfxWin();
     gx = gy = -1;
   }
   if (gx >= 0 && (int32_t)(nowMs() - goldUntil) > 0) gx = gy = -1;

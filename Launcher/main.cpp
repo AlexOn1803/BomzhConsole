@@ -552,6 +552,7 @@ void setup() {
   curFile = prefs.getString("cur", "");
   curSize = prefs.getUInt("cursz", 0);
   st.autorun = prefs.getBool("autorun", false);
+  st.sound = soundEnabled();
   firmwareStep2();
   scanGames();
   if (prefs.getBool("fwgo", false)) {   // OK was pressed on the Wi-Fi screen to install new firmware
@@ -572,8 +573,8 @@ void loop() {
   int k = inputGet();
   if (k < 0) { delay(5); return; }
   int n = (int)st.items.size();
-  if (k == K_UP) st.sel = (st.sel - 1 + n) % n;
-  if (k == K_DOWN) st.sel = (st.sel + 1) % n;
+  if (k == K_UP) { st.sel = (st.sel - 1 + n) % n; sfxClick(); }
+  if (k == K_DOWN) { st.sel = (st.sel + 1) % n; sfxClick(); }
   if (k == K_OK) {
     const MenuItem& it = st.items[st.sel];
     if (it.kind == IT_GAME) {
@@ -583,6 +584,11 @@ void loop() {
       wifiMode();
     } else if (it.kind == IT_UPDATE) {
       firmwareStep1();
+    } else if (it.kind == IT_SOUND) {
+      st.sound = !st.sound;
+      soundSetEnabled(st.sound);
+      if (st.sound) sfxSelect();
+      st.msg = st.sound ? "Звук увімкнено (п'єзо на GPIO 2)" : "Звук вимкнено в усіх іграх";
     } else if (it.kind == IT_AUTORUN) {
       st.autorun = !st.autorun;
       prefs.putBool("autorun", st.autorun);

@@ -17,6 +17,9 @@
 #define PIN_BTN_OK     9    // = BOOT: hold while plugging USB to enter download mode
 #define PIN_BTN_BACK   8    // on-board LED shares this pin: it lights up while pressed
 
+// Sound: passive piezo between GPIO 2 (through ~100 Ω) and GND. Nothing connected = silent, no harm.
+#define PIN_BUZZER     2
+
 #define TFT_SPI_FREQ  40000000
 #define SD_SPI_FREQ   20000000
 #define TFT_INVERT    true

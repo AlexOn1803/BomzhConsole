@@ -42,7 +42,7 @@ static void reset() {
 
 static void die() {
   if (mode == DEAD) return;
-  mode = DEAD;
+  mode = DEAD; sfxLose();
   deadAt = nowMs();
   sv.games++;
   if ((uint32_t)score > sv.best) { sv.best = score; newBest = true; }
@@ -65,7 +65,7 @@ static void physics(float dt) {
       for (int j = 0; j < NP; j++) if (px[j] > far) far = px[j];
       placePipe(i, far + SPACING);
     }
-    if (!passed[i] && px[i] + PW < BX) { passed[i] = true; score++; }
+    if (!passed[i] && px[i] + PW < BX) { passed[i] = true; score++; sfxCoin(); }
     // collision: bird is a circle r=9 at (BX, by), shrunk a bit to feel fair
     float r = 7.5f;
     if (BX + r > px[i] && BX - r < px[i] + PW) {
@@ -188,8 +188,8 @@ void loop() {
       continue;
     }
     bool flap = k == K_OK || k == K_UP;
-    if (mode == READY && flap) { mode = PLAY; vy = FLAP; }
-    else if (mode == PLAY) { if (flap) vy = FLAP; else if (k == K_BACK) mode = PAUSE; }
+    if (mode == READY && flap) { mode = PLAY; vy = FLAP; sfxJump(); }
+    else if (mode == PLAY) { if (flap) { vy = FLAP; sfxJump(); } else if (k == K_BACK) mode = PAUSE; }
     else if (mode == PAUSE) { if (k == K_OK || k == K_BACK) { mode = PLAY; lastT = nowMs(); } }
     else if (mode == DEAD && k == K_OK && nowMs() - deadAt > 900) { reset(); mode = READY; }
   }

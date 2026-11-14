@@ -158,7 +158,7 @@ static void die(const char* by) {
   if (gm.depth > gm.bestDepth) gm.bestDepth = gm.depth;
   gm.games++;
   say("Тебе вбив %s.", by);
-  mode = M_DEAD;
+  mode = M_DEAD; sfxLose();
   saveData(&gm, sizeof gm);
   dirty = false;
 }
@@ -173,7 +173,7 @@ static void monstersAct() {
     if (abs(dx) <= 1 && abs(dy) <= 1 && (dx == 0 || dy == 0)) {   // adjacent (no diagonals): attack
       int dmg = std::max(1, t.atk + rnd(3) - 1 - gm.def);
       if (gm.hp <= dmg) { gm.hp = 0; die(t.name); return; }
-      gm.hp -= dmg;
+      gm.hp -= dmg; sfxHit();
       say("%s б'є тебе: −%d", t.name, dmg);
       continue;
     }
@@ -212,6 +212,7 @@ static void endTurn() {
 static void pickUp() {
   Item* it = itemAt(gm.px, gm.py);
   if (!it) return;
+  sfxCoin();
   switch (it->kind) {
     case I_GOLD: gm.gold += it->amount; say("Золото: +%d", it->amount); break;
     case I_POTION: gm.potions++; say("Зілля здоров'я (маєш %d)", gm.potions); break;
@@ -229,11 +230,11 @@ static void tryMove(int dx, int dy) {
     int dmg = std::max(1, gm.atk + rnd(3) - 1 - t.def);
     m->awake = 1;
     if (m->hp <= dmg) {
-      m->hp = 0; gm.kills++;
+      m->hp = 0; gm.kills++; sfxCoin();
       say("Ти вбив: %s (+%d досвіду)", t.name, t.xp);
       gainXp(t.xp);
       if (!rnd(4) && !itemAt(nx, ny)) for (auto& i : gm.item) if (!i.kind) { i = {I_GOLD, (uint8_t)nx, (uint8_t)ny, (uint8_t)(3 + gm.depth * 2)}; break; }
-    } else { m->hp -= dmg; say("Ти б'єш: %s −%d", t.name, dmg); }
+    } else { m->hp -= dmg; say("Ти б'єш: %s −%d", t.name, dmg); sfxClick(); }
     endTurn();
     return;
   }
@@ -245,7 +246,7 @@ static void tryMove(int dx, int dy) {
 }
 
 static void descend() {
-  gm.depth++;
+  gm.depth++; sfxWin();
   if (gm.depth > gm.bestDepth) gm.bestDepth = gm.depth;
   genLevel();
   computeFov();

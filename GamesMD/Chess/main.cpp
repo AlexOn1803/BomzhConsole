@@ -287,8 +287,8 @@ static void refresh() {
   if (!nLegal) {
     sv.over = 1; mode = M_OVER;
     if (inCheck(sv.pos, sv.pos.side)) {
-      if (sv.pos.side > 0) { sv.losses++; strcpy(overText, "Мат. Переміг комп'ютер."); }
-      else { sv.wins++; strcpy(overText, "Мат! Ти переміг!"); }
+      if (sv.pos.side > 0) { sv.losses++; strcpy(overText, "Мат. Переміг комп'ютер."); sfxLose(); }
+      else { sv.wins++; strcpy(overText, "Мат! Ти переміг!"); sfxWin(); }
     } else { sv.draws++; strcpy(overText, "Пат — нічия."); }
   } else if (sv.pos.half >= 100 || insufficient()) {
     sv.over = 1; mode = M_OVER; sv.draws++;
@@ -300,6 +300,7 @@ static void playerMove(const Move& m) {
   if (sv.nh == 20) { memmove(sv.hist, sv.hist + 1, sizeof(Pos) * 19); sv.nh--; }
   sv.hist[sv.nh++] = sv.pos;
   make(sv.pos, m);
+  if (m.cap) sfxHit(); else sfxClick();
   sv.last = m; sv.hasLast = 1; sel = -1;
   refresh();
   if (!sv.over) mode = M_THINK;
@@ -463,6 +464,7 @@ void loop() {
     Move m;
     if (think(sv.pos, DEPTH[sv.level], TIME[sv.level], m)) {
       make(sv.pos, m); sv.last = m; sv.hasLast = 1;
+      if (m.cap) sfxHit(); else tone2(700, 40);
     }
     mode = M_PLAY;
     refresh();

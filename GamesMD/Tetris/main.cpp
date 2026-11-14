@@ -68,7 +68,7 @@ static uint32_t gravity() {
 }
 
 static void gameOver() {
-  mode = OVER;
+  mode = OVER; sfxLose();
   sv.games++;
   newBest = score > sv.best;
   if (newBest) sv.best = score;
@@ -122,6 +122,7 @@ static void lockPiece() {
     static const int PTS[5] = {0, 100, 300, 500, 800};
     score += PTS[n] * level;
     lines += n;
+    if (1 + lines / 10 > level) sfxWin(); else sfxCoin();
     level = 1 + lines / 10;
     mode = CLEARING;
     clearEnd = nowMs() + 180;

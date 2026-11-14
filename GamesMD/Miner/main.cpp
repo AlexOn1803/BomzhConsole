@@ -127,11 +127,13 @@ static void damage(float d, const char* why) {
   if (g.hull <= 0) {
     g.hull = 0;
     snprintf(b, sizeof b, "Машину знищено: %s", why);
+    sfxLose();
     say(b, 6000);
     mode = M_DEAD;
     return;
   }
   snprintf(b, sizeof b, "%s: −%d міцності", why, (int)d);
+  sfxHit();
   say(b);
 }
 
@@ -140,11 +142,12 @@ static void collect(uint8_t t) {
     int i = t - T_ORE0;
     if (cargoCount() >= maxCargo()) { say("Трюм повний! Руду втрачено. Повертайся на станцію."); return; }
     g.cargo[i]++;
+    sfxCoin();
     char b[64];
     snprintf(b, sizeof b, "+ %s (%d $)", ORES[i].name, ORES[i].price);
     say(b, 1200);
   } else if (t == T_CORE) {
-    g.won = 1; mode = M_WIN;
+    g.won = 1; mode = M_WIN; sfxWin();
     saveData(&g, sizeof g);
   }
 }
@@ -279,7 +282,7 @@ static void buyRow(const ShopRow& r) {
   if (r.kind == 0) {
     int32_t v = cargoValue();
     if (!v) { say("Трюм порожній."); return; }
-    g.money += v; memset(g.cargo, 0, sizeof g.cargo); g.trips++;
+    g.money += v; memset(g.cargo, 0, sizeof g.cargo); g.trips++; sfxWin();
     snprintf(b, sizeof b, "Продано на %ld $", (long)v); say(b);
     saveData(&g, sizeof g);
     return;

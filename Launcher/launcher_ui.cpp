@@ -13,6 +13,7 @@ static const uint16_t CARD = rgb(0x141a22), CARD_SEL = rgb(0x2a2210), TAG = rgb(
 BM(IC_CART, "..######..", ".#......#.", ".#.####.#.", ".#.#..#.#.", ".#.####.#.", ".#......#.", ".#......#.", ".#.#..#.#.", ".########.", "..........");
 BM(IC_WIFI, "..........", "..######..", ".#......#.", "#..####..#", "..#....#..", ".#..##..#.", "...#..#...", "....##....", "....##....", "..........");
 BM(IC_UPD, "....##....", "....##....", "....##....", "....##....", ".########.", "..######..", "...####...", "....##....", "..........", "##########");
+BM(IC_SND, "..........", "....#..#..", "...##...#.", ".####.#..#", ".####.#..#", ".####.#..#", "...##...#.", "....#..#..", "..........", "..........");
 BM(IC_AUTO, "....##....", "...####...", "..##..##..", ".##....##.", ".#......#.", ".#..#...#.", ".##..#.##.", "..##..##..", "...####...", "..........");
 
 // Without a .txt the game is shown by its file name; title, description and icon come from the SD card.
@@ -92,6 +93,7 @@ void buildItems(LauncherState& st) {
   if (st.fwPending) st.items.push_back({IT_UPDATE, -1});
   st.items.push_back({IT_WIFI, -1});
   st.items.push_back({IT_AUTORUN, -1});
+  st.items.push_back({IT_SOUND, -1});
   if (st.sel >= (int)st.items.size()) st.sel = (int)st.items.size() - 1;
   if (st.sel < 0) st.sel = 0;
 }
@@ -146,11 +148,12 @@ void drawMenu(LauncherState& st) {
       if (g.installed || !g.onSd) fillRound(W - 18 - tw, y + 8, tw, 15, 4, TAG);
       text(tag, W - 23, y + 19, g.installed || !g.onSd ? pal::GREEN : pal::DIM, F10B, RIGHT);
     } else {
-      const char* const* icon = it.kind == IT_WIFI ? IC_WIFI : it.kind == IT_UPDATE ? IC_UPD : IC_AUTO;
+      const char* const* icon = it.kind == IT_WIFI ? IC_WIFI : it.kind == IT_UPDATE ? IC_UPD : it.kind == IT_SOUND ? IC_SND : IC_AUTO;
       bitmap(icon, 10, 22, y + 7, 2, it.kind == IT_WIFI ? pal::BLUE : it.kind == IT_UPDATE ? pal::GREEN : pal::SUB);
-      std::string label = it.kind == IT_WIFI ? "Завантажити ігри по Wi-Fi" : it.kind == IT_UPDATE ? "Оновити прошивку консолі" : "Автозапуск останньої гри";
+      std::string label = it.kind == IT_WIFI ? "Завантажити ігри по Wi-Fi" : it.kind == IT_UPDATE ? "Оновити прошивку консолі" : it.kind == IT_SOUND ? "Звук" : "Автозапуск останньої гри";
       text(label, 52, y + 22, sel ? pal::AMBER : pal::TXT, F12B);
       if (it.kind == IT_AUTORUN) text(st.autorun ? "увімк" : "вимк", W - 20, y + 22, st.autorun ? pal::GREEN : pal::DIM, F11B, RIGHT);
+      if (it.kind == IT_SOUND) text(st.sound ? "увімк" : "вимк", W - 20, y + 22, st.sound ? pal::GREEN : pal::DIM, F11B, RIGHT);
     }
     y += h + 6;
   }
