@@ -1,0 +1,178 @@
+<title>Схема пайки консолі</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one column; a board map with every pin annotated, then each module as a card with pin → pin rows */
+:root{
+  --bg:#f4f6f3; --panel:#ffffff; --fg:#17201b; --sub:#5b6a61; --line:#d5ddd6; --pcb:#1d4a33; --pcbline:#2f6b4c; --pad:#d9b45a;
+  --w-3v3:#d7262e; --w-gnd:#3a3f3c; --w-5v:#e0761b; --w-sck:#c9a400; --w-mosi:#2463d1; --w-miso:#1e9a4a; --w-tcs:#8a3fd1; --w-dc:#e05a8a; --w-sdcs:#0f9aa6; --w-btn:#6d5a3a;
+  --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101512; --panel:#18201b; --fg:#e6ece7; --sub:#97a69c; --line:#2b362f; --pcb:#163a28; --pcbline:#2f6b4c; --pad:#d9b45a;
+  --w-3v3:#ff5a5f; --w-gnd:#aab3ad; --w-5v:#ff9a45; --w-sck:#f0c93a; --w-mosi:#5b93ff; --w-miso:#3fcf72; --w-tcs:#b47bff; --w-dc:#ff7fae; --w-sdcs:#3cc8d4; --w-btn:#c9a878; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101512; --panel:#18201b; --fg:#e6ece7; --sub:#97a69c; --line:#2b362f; --pcb:#163a28; --pcbline:#2f6b4c; --pad:#d9b45a;
+  --w-3v3:#ff5a5f; --w-gnd:#aab3ad; --w-5v:#ff9a45; --w-sck:#f0c93a; --w-mosi:#5b93ff; --w-miso:#3fcf72; --w-tcs:#b47bff; --w-dc:#ff7fae; --w-sdcs:#3cc8d4; --w-btn:#c9a878; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans)}
+.wrap{max-width:980px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+h1{font-size:28px;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-size:18px;margin:0 0 4px}
+.lead{color:var(--sub);margin:6px 0 0;max-width:68ch}
+.scroll{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+svg{display:block;width:100%;min-width:720px;height:auto}
+svg text{font-family:var(--mono);font-size:13px;fill:var(--fg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card p{margin:0;color:var(--sub);font-size:13.5px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+tr:first-child td{border-top:0}
+td.from{font-family:var(--mono);font-weight:600;white-space:nowrap}
+td.arrow{color:var(--sub);width:18px;text-align:center}
+.wire{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-weight:600;white-space:nowrap}
+.wire i{width:22px;height:5px;border-radius:3px;background:var(--c);flex:none}
+.note{font-size:13px;color:var(--sub)}
+.warn{border-left:3px solid var(--w-5v);padding:10px 12px;background:var(--panel);border-radius:0 10px 10px 0;font-size:14px}
+.warn b{color:var(--fg)}
+ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Схема пайки кишенькової консолі</h1>
+    <p class="lead">ESP32-C3 SuperMini, дисплей GMT020-02 (ST7789V), microSD через перехідник Taaiot, 6 кнопок, батарея BL-5C. Колір дроту однаковий на схемі й у таблицях. Номери пінів звіряй з написами на самій платі.</p>
+  </header>
+
+  <section>
+    <h2>Плата: що на кожен пін</h2>
+    <p class="note" style="margin:0 0 10px">Вигляд зверху, USB-роз'єм угорі. Пін 2 вільний.</p>
+    <div class="scroll">
+      <svg viewBox="0 0 960 470" role="img" aria-label="Розпіновка ESP32-C3 SuperMini з підписами з'єднань">
+        <!-- board -->
+        <rect x="380" y="30" width="200" height="420" rx="14" fill="var(--pcb)" stroke="var(--pcbline)" stroke-width="2"/>
+        <rect x="445" y="12" width="70" height="40" rx="8" fill="#9aa3a0" stroke="#6e7774"/>
+        <text x="480" y="38" text-anchor="middle" style="font-size:11px;fill:#1b1f1d">USB-C</text>
+        <rect x="430" y="170" width="100" height="100" rx="6" fill="#222826"/>
+        <text x="480" y="216" text-anchor="middle" style="fill:#cfd6d2;font-size:12px">ESP32</text>
+        <text x="480" y="232" text-anchor="middle" style="fill:#cfd6d2;font-size:12px">C3</text>
+        <rect x="455" y="380" width="50" height="40" rx="4" fill="#c9c2a8"/>
+        <text x="480" y="440" text-anchor="middle" style="fill:#cfd6d2;font-size:10px">антена</text>
+        <g id="pins"></g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h2>Дисплей GMT020-02</h2>
+      <table>
+        <tr><td class="from">GND</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-gnd)"><i></i>GND</span></td></tr>
+        <tr><td class="from">VCC</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-3v3)"><i></i>3V3</span></td></tr>
+        <tr><td class="from">SCL</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-sck)"><i></i>GPIO 4</span></td></tr>
+        <tr><td class="from">SDA</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-mosi)"><i></i>GPIO 6</span></td></tr>
+        <tr><td class="from">RES</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-3v3)"><i></i>3V3</span> <span class="note">(було GPIO 3)</span></td></tr>
+        <tr><td class="from">DC</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-dc)"><i></i>GPIO 10</span></td></tr>
+        <tr><td class="from">CS</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-tcs)"><i></i>GPIO 7</span></td></tr>
+        <tr><td class="from">BLK</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-3v3)"><i></i>3V3</span></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>microSD (пальці перехідника)</h2>
+      <svg viewBox="0 0 280 150" style="min-width:0" aria-label="Пальці microSD, нумерація">
+        <path d="M30 20 H230 L250 40 V140 H30 Z" fill="none" stroke="var(--sub)" stroke-width="2"/>
+        <g id="sdpads"></g>
+        <text x="140" y="132" text-anchor="middle" style="font-size:11px;fill:var(--sub)">звір номери з перехідником</text>
+      </svg>
+      <table>
+        <tr><td class="from">1 DAT2</td><td class="arrow">—</td><td class="note">не паяти</td></tr>
+        <tr><td class="from">2 CS</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-sdcs)"><i></i>GPIO 3</span></td></tr>
+        <tr><td class="from">3 MOSI</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-mosi)"><i></i>GPIO 6</span> <span class="note">разом з SDA</span></td></tr>
+        <tr><td class="from">4 VDD</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-3v3)"><i></i>3V3</span></td></tr>
+        <tr><td class="from">5 CLK</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-sck)"><i></i>GPIO 4</span> <span class="note">разом з SCL</span></td></tr>
+        <tr><td class="from">6 GND</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-gnd)"><i></i>GND</span></td></tr>
+        <tr><td class="from">7 MISO</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-miso)"><i></i>GPIO 21</span></td></tr>
+        <tr><td class="from">8 DAT1</td><td class="arrow">—</td><td class="note">не паяти</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Кнопки 6×6</h2>
+      <p>Кожна кнопка: одна нога на свій GPIO, друга на спільний GND. Резистори не потрібні, підтяжка вмикається в коді. Беруться діагональні ноги кнопки.</p>
+      <table>
+        <tr><td class="from">▲ Вгору</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-btn)"><i></i>GPIO 1</span></td></tr>
+        <tr><td class="from">▼ Вниз</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-btn)"><i></i>GPIO 0</span></td></tr>
+        <tr><td class="from">◀ Вліво</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-btn)"><i></i>GPIO 20</span></td></tr>
+        <tr><td class="from">▶ Вправо</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-btn)"><i></i>GPIO 5</span></td></tr>
+        <tr><td class="from">OK</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-btn)"><i></i>GPIO 9</span> <span class="note">це BOOT</span></td></tr>
+        <tr><td class="from">Назад</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-btn)"><i></i>GPIO 8</span></td></tr>
+        <tr><td class="from">другі ноги</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-gnd)"><i></i>GND</span></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Живлення</h2>
+      <svg viewBox="0 0 300 200" style="min-width:0" aria-label="Батарея, зарядка, вимикач, плата">
+        <rect x="10" y="60" width="70" height="80" rx="6" fill="none" stroke="var(--sub)" stroke-width="2"/>
+        <text x="45" y="95" text-anchor="middle" style="font-size:12px">BL-5C</text>
+        <text x="45" y="112" text-anchor="middle" style="font-size:11px;fill:var(--sub)">3,7 В</text>
+        <rect x="115" y="50" width="75" height="100" rx="6" fill="none" stroke="var(--sub)" stroke-width="2"/>
+        <text x="152" y="72" text-anchor="middle" style="font-size:11px">зарядка</text>
+        <text x="152" y="86" text-anchor="middle" style="font-size:11px;fill:var(--sub)">Type-C</text>
+        <rect x="215" y="20" width="44" height="26" rx="4" fill="none" stroke="var(--sub)" stroke-width="2"/>
+        <text x="237" y="14" text-anchor="middle" style="font-size:10px;fill:var(--sub)">вимикач</text>
+        <!-- wires -->
+        <path d="M80 80 H115" stroke="var(--w-3v3)" stroke-width="3" fill="none"/>
+        <text x="97" y="74" text-anchor="middle" style="font-size:10px">B+</text>
+        <path d="M80 120 H115" stroke="var(--w-gnd)" stroke-width="3" fill="none"/>
+        <text x="97" y="135" text-anchor="middle" style="font-size:10px">B−</text>
+        <path d="M190 80 H205 V33 H215" stroke="var(--w-5v)" stroke-width="3" fill="none"/>
+        <text x="182" y="104" text-anchor="end" style="font-size:10px">OUT+</text>
+        <path d="M259 33 H285 V172" stroke="var(--w-5v)" stroke-width="3" fill="none"/>
+        <path d="M190 120 H210 V172" stroke="var(--w-gnd)" stroke-width="3" fill="none"/>
+        <text x="182" y="124" text-anchor="end" style="font-size:10px">OUT−</text>
+        <text x="285" y="190" text-anchor="middle" style="font-size:12px;font-weight:600">5V</text>
+        <text x="210" y="190" text-anchor="middle" style="font-size:12px;font-weight:600">GND</text>
+      </svg>
+      <table>
+        <tr><td class="from">BL-5C +</td><td class="arrow">→</td><td>зарядка B+</td></tr>
+        <tr><td class="from">BL-5C −</td><td class="arrow">→</td><td>зарядка B−</td></tr>
+        <tr><td class="from">OUT+</td><td class="arrow">→</td><td>середня нога вимикача, крайня нога → <span class="wire" style="--c:var(--w-5v)"><i></i>5V</span></td></tr>
+        <tr><td class="from">OUT−</td><td class="arrow">→</td><td><span class="wire" style="--c:var(--w-gnd)"><i></i>GND</span></td></tr>
+      </table>
+      <p>Якщо на зарядці лише B+ і B−, без OUT, бери живлення з B+ і B− (через вимикач).</p>
+    </div>
+  </section>
+
+  <section class="warn">
+    <b>Перед пайкою:</b>
+    <ul style="margin-top:6px">
+      <li>Перш ніж вставляти USB у саму ESP32 для прошивки, вимкни вимикач, щоб USB і батарея не працювали одночасно.</li>
+      <li>GPIO 4 і 6 спільні для дисплея та SD: від піна йде один дріт, а від нього відгалуження до обох модулів.</li>
+      <li>На GPIO 8 на платі є синій світлодіод. Коли тиснеш «Назад», він світиться — так і має бути.</li>
+      <li>OK на GPIO 9: якщо тримати OK під час вставляння кабелю, плата переходить у режим прошивки.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const L=[["5V","--w-5v","від вимикача (батарея)"],["GND","--w-gnd","дисплей, SD, кнопки, зарядка"],["3V3","--w-3v3","дисплей VCC · RES · BLK, SD VDD"],["4","--w-sck","дисплей SCL + SD CLK"],["3","--w-sdcs","SD CS"],["2",null,"вільний"],["1","--w-btn","кнопка ▲"],["0","--w-btn","кнопка ▼"]];
+const R=[["5","--w-btn","кнопка ▶"],["6","--w-mosi","дисплей SDA + SD MOSI"],["7","--w-tcs","дисплей CS"],["8","--w-btn","кнопка Назад"],["9","--w-btn","кнопка OK"],["10","--w-dc","дисплей DC"],["20","--w-btn","кнопка ◀"],["21","--w-miso","SD MISO"]];
+const NS="http://www.w3.org/2000/svg",g=document.getElementById("pins");
+function el(t,a,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;g.appendChild(e);return e}
+function side(list,left){list.forEach(([n,c,d],i)=>{
+  const y=80+i*44,px=left?380:580,col=c?`var(${c})`:"var(--line)";
+  el("circle",{cx:left?395:565,cy:y,r:9,fill:"var(--pad)"});
+  el("circle",{cx:left?395:565,cy:y,r:4,fill:"var(--pcb)"});
+  el("text",{x:left?412:548,y:y+4,"text-anchor":left?"start":"end",style:"fill:#e8efe9;font-size:12px;font-weight:600"},/^\d+$/.test(n)?n:n);
+  el("path",{d:`M${left?386:574} ${y} H${left?250:710}`,stroke:col,"stroke-width":5,"stroke-linecap":"round",fill:"none"});
+  el("text",{x:left?240:720,y:y-6,"text-anchor":left?"end":"start",style:"font-weight:600"},/^\d+$/.test(n)?"GPIO "+n:n);
+  el("text",{x:left?240:720,y:y+12,"text-anchor":left?"end":"start",style:"fill:var(--sub);font-size:12px;font-family:var(--sans)"},d);
+});}
+side(L,true);side(R,false);
+const sp=document.getElementById("sdpads");
+for(let i=0;i<8;i++){const x=48+i*24;
+  const r=document.createElementNS(NS,"rect");Object.entries({x,y:40,width:14,height:46,rx:2,fill:[0,7].includes(i)?"var(--line)":"var(--pad)"}).forEach(([k,v])=>r.setAttribute(k,v));sp.appendChild(r);
+  const t=document.createElementNS(NS,"text");t.setAttribute("x",x+7);t.setAttribute("y",104);t.setAttribute("text-anchor","middle");t.textContent=i+1;sp.appendChild(t);}
+</script>
