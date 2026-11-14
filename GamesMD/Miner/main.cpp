@@ -217,7 +217,16 @@ static void tick(float dt) {
     } else fallTiles = 0;
     // held directions keep moving
     if (!act && mode == M_PLAY) {
-      if (inputHeld(K_DOWN)) startAction(0, 1);
+      int side = inputHeld(K_LEFT) ? -1 : inputHeld(K_RIGHT) ? 1 : 0;
+      if (inputHeld(K_UP) && side) {
+        // flying up while steering: go diagonally if there is room, otherwise up or sideways
+        int nx = g.px + side, ny = g.py - 1;
+        if (g.fuel > 0 && inMap(nx, ny) && !solidAt(nx, ny) && (!solidAt(nx, g.py) || !solidAt(g.px, ny))) {
+          g.face = side > 0 ? 3 : 2;
+          adx = side; ady = -1; actT = 0; act = 4; actDur = 0.36f / (1 + g.up[4] * 0.35f);
+        } else if (inMap(g.px, ny) && !solidAt(g.px, ny)) startAction(0, -1);
+        else startAction(side, 0);
+      } else if (inputHeld(K_DOWN)) startAction(0, 1);
       else if (inputHeld(K_LEFT)) startAction(-1, 0);
       else if (inputHeld(K_RIGHT)) startAction(1, 0);
       else if (inputHeld(K_UP)) startAction(0, -1);
